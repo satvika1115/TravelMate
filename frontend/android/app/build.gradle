@@ -16,20 +16,10 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    signingConfigs {
-        release {
-            storeFile file('travelmate-release.jks')
-            storePassword 'TravelMate@2025'
-            keyAlias 'travelmate'
-            keyPassword 'TravelMate@2025'
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }
