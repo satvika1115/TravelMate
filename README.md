@@ -252,9 +252,9 @@ Place GTFS `.txt` files in `data/bus_data/`, `data/metro_data/`, `data/mmts_data
 
 ## F-Droid
 
-TravelMate Beta is being prepared for F-Droid. See `fdroid-recipe.yml` and `com.satvika.travelmate.yml` for the submission recipe.
+TravelMate is being prepared for F-Droid. See `fdroid-recipe.yml` and `com.swecha.travelmate.yml` for the submission recipe.
 
-App ID: `com.satvika.travelmate`
+App ID: `com.swecha.travelmate`
 License: GPL-3.0-only
 
 ---
@@ -268,6 +268,17 @@ Found a bug or have a suggestion?
 
 ---
 
+## Contributors
+
+This project is developed as part of a [Swecha](https://swecha.org) internship.
+
+| Name | Role |
+|------|------|
+| Satvika Kalla | Lead developer |
+| Neelapu Nandini | Contributor |
+
+---
+
 ## License
 
 **GPL-3.0-only** — free to use, study, modify and distribute under the same license.
@@ -275,5 +286,5 @@ See [LICENSE](./LICENSE) for full text.
 
 ---
 
-> TravelMate Beta · v0.9.0-beta · Built for Hyderabad commuters
+> TravelMate · v0.9.0-beta · Built for Hyderabad commuters · A Swecha Internship Project
 > Metro · Bus · MMTS · RidePool · City Analytics

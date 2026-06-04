@@ -9,11 +9,11 @@
 - [x] No account or login required
 - [x] No personal data collected or transmitted to any server
 - [x] AndroidManifest.xml uses only INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION permissions
-- [x] App ID (applicationId) is com.satvika.travelmate
+- [x] App ID (applicationId) is com.swecha.travelmate
 - [x] versionCode and versionName set in frontend/android/app/build.gradle
 - [x] Git tag v0.9.0-beta exists and points to a buildable commit
 - [x] Fastlane metadata present at fastlane/metadata/android/en-US/
-- [x] F-Droid recipe file present at com.satvika.travelmate.yml (repository root)
+- [x] F-Droid recipe file present at com.swecha.travelmate.yml (repository root)
 - [ ] Screenshots provided in fastlane/metadata/android/en-US/screenshots/ (see README.txt in that directory)
 - [ ] Signing keystore removed or excluded from the build for F-Droid (F-Droid re-signs with its own key)
 
@@ -22,7 +22,7 @@
 ## App Description
 
 **Name:** TravelMate Beta  
-**Package ID:** com.satvika.travelmate  
+**Package ID:** com.swecha.travelmate  
 **License:** GPL-3.0-only  
 **Version:** 0.9.0-beta (versionCode 1)  
 **Category:** Navigation  
@@ -77,7 +77,7 @@ The release APK will be produced at:
 
 ### F-Droid Build Recipe
 
-The F-Droid recipe is at `com.satvika.travelmate.yml` in the repository root.
+The F-Droid recipe is at `com.swecha.travelmate.yml` in the repository root.
 
 ```yaml
 subdir: frontend/android
@@ -121,7 +121,7 @@ See the section below for the exact text to paste into the F-Droid data merge re
 ## F-Droid Data Merge Request Text
 
 ```
-## New app: com.satvika.travelmate (TravelMate Beta)
+## New app: com.swecha.travelmate (TravelMate Beta)
 
 ### Summary
 
@@ -137,7 +137,7 @@ data — no backend, no account, no tracking.
 - No tracking / analytics SDKs ✓
 - No account required ✓
 - Source: https://github.com/satvika1115/TravelMate
-- Build recipe: com.satvika.travelmate.yml
+- Build recipe: com.swecha.travelmate.yml
 
 ### Build notes
 
