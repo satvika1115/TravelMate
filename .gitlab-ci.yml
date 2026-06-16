@@ -3,11 +3,10 @@ stages:
 
 variables:
   ANDROID_SDK_ROOT: /opt/android-sdk
-  JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
 build:
   stage: build
-  image: eclipse-temurin:17-jdk
+  image: eclipse-temurin:21-jdk
   before_script:
     - apt-get update && apt-get install -y curl unzip git
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
@@ -18,12 +17,15 @@ build:
     - mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
     - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
     - yes | sdkmanager --licenses > /dev/null 2>&1
-    - sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+    - sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
   script:
     - cd frontend
     - npm install
     - npm run build
-    - npx cap sync android
+    - rm -f android/local.properties
+    - echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+    - rm -rf android/app/src/main/assets/public
+    - cp -r dist android/app/src/main/assets/public
     - cd android
     - chmod +x gradlew
     - ./gradlew assembleDebug
