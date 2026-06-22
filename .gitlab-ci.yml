@@ -4,24 +4,35 @@ stages:
 build:
   stage: build
   image: eclipse-temurin:21-jdk
+  retry: 2
+  timeout: 30 minutes
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - frontend/node_modules/
+      - /opt/android-sdk/
   before_script:
     - apt-get update -qq && apt-get install -y -qq curl unzip git
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y -qq nodejs
-    - curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/cmdtools.zip
-    - mkdir -p /opt/android-sdk/cmdline-tools
-    - unzip -q /tmp/cmdtools.zip -d /opt/android-sdk/cmdline-tools
-    - mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
+    - |
+      if [ ! -f /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager ]; then
+        curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/cmdtools.zip
+        mkdir -p /opt/android-sdk/cmdline-tools
+        unzip -q /tmp/cmdtools.zip -d /opt/android-sdk/cmdline-tools
+        mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
+      fi
     - export ANDROID_SDK_ROOT=/opt/android-sdk
     - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
     - yes | sdkmanager --licenses > /dev/null 2>&1 || true
-    - sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+    - |
+      if [ ! -d /opt/android-sdk/platforms/android-36 ]; then
+        sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      fi
   script:
     - cd frontend
     - npm install
     - npm run build
-    - ls -la dist/
-    - rm -f android/local.properties
     - echo "sdk.dir=/opt/android-sdk" > android/local.properties
     - rm -rf android/app/src/main/assets/public
     - cp -r dist android/app/src/main/assets/public
@@ -29,6 +40,7 @@ build:
     - chmod +x gradlew
     - ./gradlew assembleDebug --no-daemon --stacktrace
   artifacts:
+    name: "TravelMate-debug-$CI_COMMIT_SHORT_SHA"
     paths:
       - frontend/android/app/build/outputs/apk/debug/app-debug.apk
-    expire_in: 30 days
+    expire_in: 90 days
