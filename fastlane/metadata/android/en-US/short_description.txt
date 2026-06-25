@@ -1,1 +1,1 @@
-Multimodal transit planner for Hyderabad — Metro, MMTS, Bus, offline routing
+Plan Hyderabad trips by Metro, MMTS & Bus. Free, offline, Telugu support.
