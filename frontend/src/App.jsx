@@ -38,13 +38,12 @@ function _parseUrlLoc(param) {
   return { lat, lon, name }
 }
 
-function BetaStatusBar() {
+function StatusBar() {
   const { t } = useLang()
   return (
-    <div className="beta-status-bar" role="contentinfo" aria-label="Beta release information">
+    <div className="beta-status-bar" role="contentinfo" aria-label="App version information">
       <span className="beta-status-bar__left">
-        <span className="beta-status-bar__pill">{t.betaLabel || 'Beta'}</span>
-        {APP_RELEASE} · v{APP_VERSION}
+        v{APP_VERSION}
       </span>
       <span className="beta-status-bar__links">
         <a href={BUG_URL} target="_blank" rel="noopener noreferrer" className="beta-status-bar__link" aria-label="Report a bug">🐞 {t.reportIssue || 'Report Issue'}</a>
@@ -419,7 +418,7 @@ export default function App() {
           {view === 'analytics' && <AnalyticsPage />}
           {view === 'feedback'  && <FeedbackPage />}
         </Suspense>
-        <BetaStatusBar />
+        <StatusBar />
       </div>
     </LanguageProvider>
   )

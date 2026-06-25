@@ -312,8 +312,7 @@ export const te = {
   feedbackInfo3: 'మీరు సమస్య పేజీలో పురోగతిని ట్రాక్ చేయవచ్చు',
   feedbackViewIssues: 'అన్ని సమస్యలు చూడండి',
 
-  // Beta status bar
-  betaLabel: 'బీటా',
+  // Status bar
   reportIssue: 'సమస్య నివేదించండి',
   suggestFeature: 'ఫీచర్ సూచించండి',
   offlineMsg: 'ఆఫ్\u200Cలైన్ — మార్గ ప్లానింగ్ పనిచేస్తుంది; మ్యాప్ శోధన పరిమితం కావచ్చు.',

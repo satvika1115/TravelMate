@@ -312,8 +312,7 @@ export const en = {
   feedbackInfo3: 'You can track progress on the issue page',
   feedbackViewIssues: 'View all issues',
 
-  // Beta status bar
-  betaLabel: 'Beta',
+  // Status bar
   reportIssue: 'Report Issue',
   suggestFeature: 'Suggest Feature',
   offlineMsg: 'Offline — route planning works; map search may be limited.',
