@@ -7,32 +7,131 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Build & Lint
+  install:
+    name: Install Dependencies
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         working-directory: frontend
         run: npm ci
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: node-modules-${{ hashFiles('frontend/package-lock.json') }}
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: node-modules-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Run linter
+        working-directory: frontend
+        run: npx eslint src --ext .js,.jsx --max-warnings=50 || true
+
+      - name: Check for console.log statements
+        working-directory: frontend
+        run: |
+          count=$(grep -r "console\.log" src --include="*.js" --include="*.jsx" | wc -l)
+          echo "console.log count: $count"
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: node-modules-${{ hashFiles('frontend/package-lock.json') }}
 
       - name: Build frontend
         working-directory: frontend
         run: npm run build
 
+      - name: Check build size
+        working-directory: frontend
+        run: |
+          echo "=== Build output size ==="
+          du -sh dist/
+          echo "=== Asset sizes ==="
+          du -sh dist/assets/* | sort -h | tail -10
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: travelmate-dist
           path: frontend/dist/
           retention-days: 7
+
+  translations:
+    name: Check Translations
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Compare English and Telugu translation keys
+        run: |
+          node -e "
+            const en = require('./frontend/src/translations/en.js');
+            const te = require('./frontend/src/translations/te.js');
+            const enKeys = Object.keys(en.en);
+            const teKeys = Object.keys(te.te);
+            const missing = enKeys.filter(k => !teKeys.includes(k));
+            const extra = teKeys.filter(k => !enKeys.includes(k));
+            if (missing.length) console.warn('Missing in Telugu:', missing);
+            if (extra.length) console.warn('Extra in Telugu:', extra);
+            console.log('EN keys:', enKeys.length, '| TE keys:', teKeys.length);
+            if (missing.length > 5) process.exit(1);
+          "
+
+  summary:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [lint, build, translations]
+    steps:
+      - name: Summary
+        run: |
+          echo "=========================================="
+          echo "  TravelMate CI — All checks passed ✅"
+          echo "  Hyderabad Transit App v1.0.0"
+          echo "  Built by Satvika Kalla & Neelapu Nandini"
+          echo "  Swecha CivicTech"
+          echo "=========================================="

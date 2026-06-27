@@ -1,10 +1,11 @@
-# TravelMate Beta — Hyderabad Transit Intelligence
+# TravelMate — Hyderabad Transit Intelligence
 
-> **Public Beta · v0.9.0-beta**
+> **v1.0.0**
 > A civic-tech multimodal transit planner for Hyderabad — Bus, Metro, MMTS, RidePool and City Analytics in one offline-capable, bilingual app.
 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-0.9.0--beta-orange)](https://github.com/satvika1115/TravelMate/releases)
+[![CI](https://github.com/satvika1115/TravelMate/actions/workflows/ci.yml/badge.svg)](https://github.com/satvika1115/TravelMate/actions/workflows/ci.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](./LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)](https://github.com/satvika1115/TravelMate/releases)
 [![Platform](https://img.shields.io/badge/platform-Android%207%2B%20%7C%20Web-brightgreen)](https://github.com/satvika1115/TravelMate)
 
 ---
