@@ -1,23 +1,114 @@
 stages:
+  - install
+  - check
   - build
+  - package
 
-build:
+variables:
+  ANDROID_SDK_ROOT: /opt/android-sdk
+  NODE_VERSION: "22"
+
+# Cache node_modules across jobs
+.node_cache: &node_cache
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+    paths:
+      - frontend/node_modules/
+    policy: pull
+
+install:
+  stage: install
+  image: node:22-slim
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+    paths:
+      - frontend/node_modules/
+    policy: push
+  script:
+    - cd frontend
+    - npm ci
+  only:
+    - travelmate
+    - main
+    - merge_requests
+
+lint:
+  stage: check
+  image: node:22-slim
+  <<: *node_cache
+  script:
+    - cd frontend
+    - echo "=== Running ESLint ==="
+    - npx eslint src --ext .js,.jsx --max-warnings=50 || true
+    - echo "=== Checking for console.log ==="
+    - count=$(grep -r "console\.log" src --include="*.js" --include="*.jsx" | wc -l)
+    - echo "console.log count $count"
+  only:
+    - travelmate
+    - main
+    - merge_requests
+
+translations:
+  stage: check
+  image: node:22-slim
+  <<: *node_cache
+  script:
+    - echo "=== Checking English vs Telugu translation keys ==="
+    - node -e "
+        const en = require('./frontend/src/translations/en.js');
+        const te = require('./frontend/src/translations/te.js');
+        const enKeys = Object.keys(en.en);
+        const teKeys = Object.keys(te.te);
+        const missing = enKeys.filter(k => !teKeys.includes(k));
+        const extra = teKeys.filter(k => !enKeys.includes(k));
+        if (missing.length) console.warn('Missing in Telugu:', missing);
+        if (extra.length) console.warn('Extra in Telugu:', extra);
+        console.log('EN keys:', enKeys.length, '| TE keys:', teKeys.length);
+      "
+  only:
+    - travelmate
+    - main
+    - merge_requests
+
+build-frontend:
   stage: build
+  image: node:22-slim
+  <<: *node_cache
+  script:
+    - cd frontend
+    - npm run build
+    - echo "=== Build size ==="
+    - du -sh dist/
+  artifacts:
+    name: "travelmate-dist-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - frontend/dist/
+    expire_in: 1 day
+  only:
+    - travelmate
+    - main
+    - merge_requests
+
+build-apk:
+  stage: package
   image: eclipse-temurin:21-jdk
   retry: 2
-  timeout: 30 minutes
-  variables:
-    ANDROID_SDK_ROOT: /opt/android-sdk
+  timeout: 40 minutes
+  needs:
+    - build-frontend
   before_script:
-    - apt-get update -qq && apt-get install -y -qq curl unzip git
-    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get update -qq && apt-get install -y -qq curl unzip git nodejs npm
+    - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     - apt-get install -y -qq nodejs
     - curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/cmdtools.zip
     - mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
     - unzip -q /tmp/cmdtools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
     - mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
     - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
-    # Pre-accept licenses by writing the hash files directly (avoids yes | sdkmanager SIGPIPE issue)
     - mkdir -p $ANDROID_SDK_ROOT/licenses
     - printf "24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n8933bad161af4408b01491c1813e7f8aab25b372" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
     - printf "84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
@@ -27,15 +118,19 @@ build:
     - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
     - cd frontend
     - npm install
-    - npm run build
     - echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
     - rm -rf android/app/src/main/assets/public
     - cp -r dist android/app/src/main/assets/public
     - cd android
     - chmod +x gradlew
     - ./gradlew assembleDebug --no-daemon --stacktrace
+    - echo "=== APK size ==="
+    - du -sh app/build/outputs/apk/debug/app-debug.apk
   artifacts:
-    name: "TravelMate-debug-$CI_COMMIT_SHORT_SHA"
+    name: "TravelMate-$CI_COMMIT_SHORT_SHA"
     paths:
       - frontend/android/app/build/outputs/apk/debug/app-debug.apk
     expire_in: 90 days
+  only:
+    - travelmate
+    - main
