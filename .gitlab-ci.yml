@@ -12,6 +12,7 @@ variables:
 .node_cache: &node_cache
   cache:
     key:
+      prefix: "node-modules"
       files:
         - frontend/package-lock.json
     paths:
@@ -23,6 +24,7 @@ install:
   image: node:22-slim
   cache:
     key:
+      prefix: "node-modules"
       files:
         - frontend/package-lock.json
     paths:
