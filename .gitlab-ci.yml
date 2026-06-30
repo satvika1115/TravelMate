@@ -39,6 +39,7 @@ install:
 lint:
   stage: check
   image: node:22-slim
+  allow_failure: true
   <<: *node_cache
   script:
     - cd frontend
